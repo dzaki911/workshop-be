@@ -1,0 +1,171 @@
+{
+  "info": {
+    "name": "Raport Evaluasi Fungsionaris - API v1",
+    "description": "Koleksi sesi 2: CRUD aspek & raport. Jalankan lokal (APP_ENV=development) setelah migrasi + seed. Auth/JWT dilengkapi sesi 3.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "aspectId", "value": "6" },
+    { "key": "reportId", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Cek status server",
+          "request": { "method": "GET", "url": "{{baseUrl}}/health" },
+          "response": [
+            {
+              "name": "200 OK", "status": "OK", "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Server is running\",\n  \"data\": { \"status\": \"ok\" }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Users (Admin)",
+      "item": [
+        {
+          "name": "Daftar fungsionaris (opsional ?role=bph|staff)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/v1/admin/users?role=staff" },
+          "response": [
+            {
+              "name": "200 OK", "status": "OK", "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Data successfully retrieved\",\n  \"data\": [\n    {\n      \"id\": 4,\n      \"name\": \"Andi Staff\",\n      \"email\": \"staff@raport.local\",\n      \"role\": \"staff\",\n      \"position\": \"Staff\",\n      \"ministry\": \"Kementerian Pendidikan\",\n      \"created_at\": \"2026-10-20T17:34:28+07:00\",\n      \"updated_at\": \"2026-10-20T17:34:28+07:00\"\n    }\n  ]\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Aspects (Admin)",
+      "item": [
+        {
+          "name": "Daftar aspek (opsional ?role_type=bph|staff)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/v1/admin/aspects?role_type=staff" },
+          "response": [
+            {
+              "name": "200 OK", "status": "OK", "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Data successfully retrieved\",\n  \"data\": [\n    {\n      \"id\": 6,\n      \"name\": \"Kedisiplinan\",\n      \"description\": \"Ketepatan waktu dan kepatuhan aturan\",\n      \"role_type\": \"staff\",\n      \"created_at\": \"2026-10-20T17:34:28+07:00\",\n      \"updated_at\": \"2026-10-20T17:34:28+07:00\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Tambah aspek",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/v1/admin/aspects",
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Inisiatif\",\n  \"description\": \"Berani mengambil langkah tanpa diminta\",\n  \"role_type\": \"staff\"\n}" }
+          },
+          "response": [
+            {
+              "name": "201 Created", "status": "Created", "code": 201,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Aspect successfully created\",\n  \"data\": { \"id\": 11, \"name\": \"Inisiatif\", \"description\": \"Berani mengambil langkah tanpa diminta\", \"role_type\": \"staff\", \"created_at\": \"2026-10-20T17:40:00+07:00\", \"updated_at\": \"2026-10-20T17:40:00+07:00\" }\n}"
+            },
+            {
+              "name": "400 Validation failed", "status": "Bad Request", "code": 400,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"Validation failed\",\n  \"errors\": [\n    { \"field\": \"name\", \"message\": \"Nama aspek wajib diisi\" },\n    { \"field\": \"role_type\", \"message\": \"role_type harus bph atau staff\" }\n  ]\n}"
+            },
+            {
+              "name": "409 Duplikat", "status": "Conflict", "code": 409,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"aspek dengan nama dan role_type yang sama sudah ada\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Detail aspek",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/v1/admin/aspects/{{aspectId}}" }
+        },
+        {
+          "name": "Ubah aspek",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/v1/admin/aspects/{{aspectId}}",
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Kedisiplinan\",\n  \"description\": \"Ketepatan waktu dan kepatuhan aturan\",\n  \"role_type\": \"staff\"\n}" }
+          },
+          "response": [
+            {
+              "name": "409 Role aspek terpakai tidak boleh diubah", "status": "Conflict", "code": 409,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"aspek sudah digunakan dalam raport\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Hapus aspek (ditolak 409 bila sudah dipakai raport)",
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/api/v1/admin/aspects/{{aspectId}}" }
+        }
+      ]
+    },
+    {
+      "name": "Reports (Admin)",
+      "item": [
+        {
+          "name": "Daftar raport",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/v1/admin/reports" },
+          "response": [
+            {
+              "name": "200 OK", "status": "OK", "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Data successfully retrieved\",\n  \"data\": [\n    { \"id\": 1, \"user_id\": 4, \"user_name\": \"Andi Staff\", \"user_role\": \"staff\", \"created_by\": 1, \"average_score\": 86.2, \"overall_evaluation\": \"Performa baik.\", \"created_at\": \"2026-10-20T17:34:56+07:00\", \"updated_at\": \"2026-10-20T17:34:56+07:00\" }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Buat raport (staff: aspek id 6-10)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/v1/admin/reports",
+            "body": { "mode": "raw", "raw": "{\n  \"user_id\": 4,\n  \"overall_evaluation\": \"Performa baik, perlu meningkatkan konsistensi penyelesaian tugas.\",\n  \"scores\": [\n    { \"aspect_id\": 6, \"score\": 85 },\n    { \"aspect_id\": 7, \"score\": 90 },\n    { \"aspect_id\": 8, \"score\": 80 },\n    { \"aspect_id\": 9, \"score\": 88 },\n    { \"aspect_id\": 10, \"score\": 88 }\n  ]\n}" }
+          },
+          "response": [
+            {
+              "name": "201 Created", "status": "Created", "code": 201,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Report successfully created\",\n  \"data\": {\n    \"id\": 1,\n    \"user_id\": 4,\n    \"user_name\": \"Andi Staff\",\n    \"user_role\": \"staff\",\n    \"created_by\": 1,\n    \"average_score\": 86.2,\n    \"overall_evaluation\": \"Performa baik, perlu meningkatkan konsistensi penyelesaian tugas.\",\n    \"scores\": [\n      { \"aspect_id\": 6, \"aspect_name\": \"Kedisiplinan\", \"score\": 85 },\n      { \"aspect_id\": 7, \"aspect_name\": \"Tanggung jawab\", \"score\": 90 }\n    ],\n    \"created_at\": \"2026-10-20T17:34:56+07:00\",\n    \"updated_at\": \"2026-10-20T17:34:56+07:00\"\n  }\n}"
+            },
+            {
+              "name": "400 Validation failed", "status": "Bad Request", "code": 400,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"Validation failed\",\n  \"errors\": [\n    { \"field\": \"overall_evaluation\", \"message\": \"Evaluasi menyeluruh wajib diisi\" },\n    { \"field\": \"scores[0].score\", \"message\": \"Nilai harus 0–100\" },\n    { \"field\": \"scores[1].aspect_id\", \"message\": \"Aspek 1 tidak sesuai dengan role staff\" },\n    { \"field\": \"scores\", \"message\": \"Aspek \\\"Tanggung jawab\\\" (id 7) wajib memiliki nilai\" }\n  ]\n}"
+            },
+            {
+              "name": "409 Raport sudah ada", "status": "Conflict", "code": 409,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"fungsionaris ini sudah memiliki raport\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Detail raport",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/v1/admin/reports/{{reportId}}" }
+        },
+        {
+          "name": "Ubah raport (user_id diabaikan)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/v1/admin/reports/{{reportId}}",
+            "body": { "mode": "raw", "raw": "{\n  \"overall_evaluation\": \"Revisi evaluasi.\",\n  \"scores\": [\n    { \"aspect_id\": 6, \"score\": 100 },\n    { \"aspect_id\": 7, \"score\": 100 },\n    { \"aspect_id\": 8, \"score\": 100 },\n    { \"aspect_id\": 9, \"score\": 100 },\n    { \"aspect_id\": 10, \"score\": 99 }\n  ]\n}" }
+          }
+        },
+        {
+          "name": "Hapus raport (wajib ?confirm=true)",
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/api/v1/admin/reports/{{reportId}}?confirm=true" }
+        }
+      ]
+    }
+  ]
+}
